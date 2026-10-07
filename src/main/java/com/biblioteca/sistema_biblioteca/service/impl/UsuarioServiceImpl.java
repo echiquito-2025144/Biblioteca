@@ -9,6 +9,7 @@ import com.biblioteca.sistema_biblioteca.model.enums.EstadoUsuario;
 import com.biblioteca.sistema_biblioteca.repository.UsuarioRepository;
 import com.biblioteca.sistema_biblioteca.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -30,7 +32,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = Usuario.builder()
                 .nombre(request.getNombre())
                 .email(request.getEmail())
-                .password(request.getPassword()) // Se integrará BCrypt con Spring Security
+                .password(passwordEncoder.encode(request.getPassword()))
                 .estado(EstadoUsuario.ACTIVO)
                 .rol(request.getRol())
                 .build();
