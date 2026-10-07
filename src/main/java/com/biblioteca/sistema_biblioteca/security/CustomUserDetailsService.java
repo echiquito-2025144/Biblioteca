@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,12 +21,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el email: " + email));
+
+        // Mapeamos el rol del Enum a SimpleGrantedAuthority agregando el prefijo ROLE_
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + usuario.getRol().name());
 
         return new User(
                 usuario.getEmail(),
-                usuario.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + usuario.getRol().name()))
+                usuario.getPassword(), // Aquí se retorna el Hash BCrypt guardado en la BD
+                List.of(authority)
         );
     }
 }
